@@ -1,0 +1,77 @@
+1. Display Data Types of Each Column:
+import pandas as pd
+
+df = pd.read_csv("your_file.csv")  # Replace with your actual filename
+print(df.dtypes)
+
+2. Drop Columns and Get Statistical Summary
+df.drop(['id', 'Unnamed: 0'], axis=1, inplace=True)
+print(df.describe())
+
+3.Value Counts of Floor Values:
+floor_counts = df['floors'].value_counts().to_frame()
+print(floor_counts)
+
+4. Boxplot for Waterfront vs Price:
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+sns.boxplot(x="waterfront", y="price", data=df)
+plt.show()
+
+5.Regplot for sqft_above vs Price:
+sns.regplot(x="sqft_above", y="price", data=df)
+plt.show()
+
+6.Linear Regression with sqft_living:
+from sklearn.linear_model import LinearRegression
+
+X = df[["sqft_living"]]
+y = df["price"]
+
+lr = LinearRegression()
+lr.fit(X, y)
+
+print("R^2:", lr.score(X, y))
+
+7.Linear Regression with Multiple Features
+features = ["floors", "waterfront", "lat", "bedrooms", "sqft_basement", "view",
+            "bathrooms", "sqft_living15", "sqft_above", "grade", "sqft_living"]
+X = df[features]
+y = df["price"]
+
+lr.fit(X, y)
+print("R^2:", lr.score(X, y))
+
+ 8. Pipeline with Scaling, PolynomialFeatures, and LinearRegression:
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import StandardScaler, PolynomialFeatures
+
+pipe = Pipeline([
+    ('scale', StandardScaler()),
+    ('poly', PolynomialFeatures(degree=2)),
+    ('model', LinearRegression())
+])
+
+pipe.fit(X, y)
+print("R^2:", pipe.score(X, y))
+
+9. Ridge Regression:
+from sklearn.linear_model import Ridge
+from sklearn.model_selection import train_test_split
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=1)
+
+ridge = Ridge(alpha=0.1)
+ridge.fit(X_train, y_train)
+print("R^2:", ridge.score(X_test, y_test))
+
+10.Ridge Regression with Polynomial Features (Second Order):
+poly = PolynomialFeatures(degree=2)
+X_train_poly = poly.fit_transform(X_train)
+X_test_poly = poly.transform(X_test)
+
+ridge_poly = Ridge(alpha=0.1)
+ridge_poly.fit(X_train_poly, y_train)
+
+print("R^2:", ridge_poly.score(X_test_poly, y_test))
